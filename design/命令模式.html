@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命令模式</title>
+</head>
+<body>
+    <h1>命令模式</h1>
+    <p>命里模式主要是将命令的发出者和命令的执行者分离出来，以达到解耦的作用</p>
+
+    <script>
+        /* 执行者 */
+        var Animal  = function(animal){
+            this.name = animal
+        }
+        Animal.prototype.barking = function(){
+            console.log(this.name + 'barking')
+        }
+        Animal.prototype.eatting = function(){
+            console.log(this.name + 'eatting')
+        }
+
+        /* 命令发出 */
+        var command = function(executor){
+            /* 方法一 */
+            var barking = function(){
+                return executor.barking()
+            }
+            var eatting = function(){
+                return executor.eatting()
+            }
+            return {
+                barking : barking,
+                eatting : eatting
+            }
+
+            /* 方法二 */
+            // return {
+            //     barking : executor.barking.bind(executor),
+            //     eatting : executor.eatting.bind(executor)
+            // }
+        }
+        
+        command(new Animal('小狗')).barking()
+        command(new Animal('小狗')).eatting()
+        command(new Animal('小猫')).barking()
+        command(new Animal('小猫')).eatting()
+
+
+
+    </script>
+</body>
+</html>
