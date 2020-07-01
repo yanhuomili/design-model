@@ -1,64 +1,102 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>单例模式</title>
-</head>
-<body>
-    <h1>单例模式：</h1>
+  </head>
+  <body>
+    <h1 id="h1">单例模式：</h1>
     <p>保证一个类仅有有个实例，并提供一个访问它的全局访问点</p>
 
-    <p>一个更好控制和拓展的单例模式，应该把类和管理单例的逻辑分开</p>
+    <p>
+      一个更好控制和拓展的单例模式，应该把创建实例对象的职责和管理单例的职责分别放置在两个方法里
+    </p>
 
     <script>
-        function Animal(name){
-            this.name = name
-            this.instance = null
+      function Animal(name) {
+        this.name = name
+        this.instance = null
+      }
+      Animal.prototype.getName = function () {
+        console.log(this.name)
+      }
+      Animal.getInstance = function (name) {
+        if (!this.instance) {
+          this.instance = new Animal(name)
         }
-        Animal.prototype.getName = function(){
-            console.log(this.name)
+        return this.instance
+      }
+
+      let d = Animal.getInstance('dog')
+      let c = Animal.getInstance('cat')
+      console.log(d === c, 'd===c')
+      console.log(Animal.getInstance('dog'), 'dog')
+      console.log(Animal.getInstance('cat'), 'cat')
+
+      ////////////////////////////////
+
+      function Person(name) {
+        this.name = name
+      }
+      Person.prototype.singing = function () {
+        console.log(this.name + '正在唱歌')
+      }
+      function createSinglePerson() {
+        this.name = 'create'
+      }
+      createSinglePerson.getInstance = function (name) {
+        if (!this.instance) {
+          this.instance = new Person(name)
         }
-        Animal.getInstance=function(name){
-            if(!this.instance){
-                this.instance = new Animal(name)
-            }
-            return this.instance
+        return this.instance
+      }
+      let xiaoming = createSinglePerson.getInstance('xiaoming')
+      let xiaohong = createSinglePerson.getInstance('xiaohong')
+      xiaoming.singing()
+      xiaohong.singing()
+      console.log(xiaoming, 'xiaoming')
+      console.log(xiaoming === xiaohong, 'xiaoming===xiaohong')
+
+      /* 单例逻辑抽离 */
+
+      /* 管理单例职责 */
+      var getSingle = function (fn) {
+        var result
+        return function () {
+          return result || (result = fn.apply(this, arguments))
         }
-        
-        let d= Animal.getInstance('dog')
-        let c= Animal.getInstance('cat')
-        console.log(d === c,'d===c')
-        console.log(Animal.getInstance('dog'),'dog')
-        console.log(Animal.getInstance('cat'),'cat')
+      }
+      /* 创建实例对象职责 */
+      var createdP = function () {
+        var p = document.createElement('p')
+        p.innerHtml = 'p 标签'
+        return p
+      }
+      /* 创建实例对象职责 */
+      var createdDiv = function () {
+        var div = document.createElement('div')
+        div.innerHtml = 'div 标签'
+        return div
+      }
 
-        ////////////////////////////////
+      var getSingleP = getSingle(createdP)
+      var getSingleDiv = getSingle(createdDiv)
+      var divDom = getSingleDiv()
+      var pDom = getSingleP()
+      console.log(divDom, 'divDom')
+      console.log(pDom, 'pDom')
 
-        function Person(name){
-            this.name = name
+      var bindEvent = getSingle(function () {
+        console.log('事件绑定')
+        document.getElementById('h1').onclick = function () {
+          console.log('h1')
         }
-        Person.prototype.singing =function(){
-            console.log(this.name+'正在唱歌')
-        }
-        function createSinglePerson(){
-            this.name = 'create'
-        }
-        createSinglePerson.getInstance = function(name){
-            if(!this.instance){
-                this.instance = new Person(name)
-            }
-            return this.instance
-        }
-        let xiaoming = createSinglePerson.getInstance('xiaoming')
-        let xiaohong = createSinglePerson.getInstance('xiaohong')
-        xiaoming.singing()
-        xiaohong.singing()
-        console.log(xiaoming,'xiaoming')
-        console.log(xiaoming===xiaohong,'xiaoming===xiaohong')
-
-
-
-
-
+        return true
+      })
+      /* 借助单例模式的抽离，多次调用，但是事件绑定只会执行一次 */
+      bindEvent()
+      bindEvent()
+      bindEvent()
     </script>
-</body>
+  </body>
 </html>

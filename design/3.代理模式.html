@@ -1,0 +1,90 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>代理模式</title>
+  </head>
+  <body>
+    <h1>代理模式</h1>
+    <p>
+      代理和本体都应该提供一个相同的对外的接口，当不需要代理的时候，可以直接请求本体
+    </p>
+
+    <script>
+      /* 代理模式实现预加载 */
+      /* 本体 */
+      var myImage = (function () {
+        var imgNode = document.createElement('img')
+        imgNode.style.width = '200px'
+        imgNode.style.height = '200px'
+        document.body.appendChild(imgNode)
+        return {
+          setSrc: function (src) {
+            imgNode.src = src
+          },
+        }
+      })()
+
+      /* 代理,在这里代理负责预加载图片，等图片加载完后它的任务就完成了 */
+      var proxyImage = (function () {
+        var img = new Image()
+        img.onload = function () {
+          //真正的图片加载完后，赋值给页面展示的标签
+          myImage.setSrc(this.src)
+        }
+        return {
+          setSrc: function (src) {
+            // src 为真正图片的链接
+            /* 首先加载默认图片，等真正的图片加载完后再把真正的图片地址赋值给标签 */
+            myImage.setSrc(
+              'https://dss1.bdstatic.com/6OF1bjeh1BF3odCf/it/u=2027268084,2976496429&fm=74&app=80&f=JPEG&size=f121,90?sec=1880279984&t=c12de480fd9800a581465c1fd878d991'
+            )
+            img.src = src
+          },
+        }
+      })()
+
+      /* 使用代理预加载图片 */
+      proxyImage.setSrc(
+        'https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1593618630&di=91fa06ac60f0eb50c4dbeef1ea10fa10&src=http://pic1.win4000.com/wallpaper/d/5993edf8a31da.jpg'
+      )
+      /* 等哪天不需要预加载了，就不在需要代理了 */
+      // myImage.setSrc(
+      //   'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1190326523,1121589058&fm=26&gp=0.jpg'
+      // )
+
+      /* 构造函数模式 */
+      function Mimage() {}
+      Mimage.prototype.setSrc = function (src) {
+        var imgNode = document.createElement('img')
+        imgNode.src = src
+        imgNode.style.width = '200px'
+        imgNode.style.height = '200px'
+        document.body.appendChild(imgNode)
+        return true
+      }
+
+      function Pimage() {
+        // this.target = target
+      }
+      Pimage.prototype.setSrc = function (src, target) {
+        /* 通过代理的时候，本体先展示默认图片 */
+        target.setSrc(
+          'https://img0.bdstatic.com/static/searchdetail/img/logo-2X_0c4ef02.png'
+        )
+        var img = new Image()
+        img.src = src
+        img.onload = function () {
+          target.setSrc(src) // 等真正需要加载的图片加载出来后，再把链接赋值给本体
+        }
+      }
+
+      let mImg = new Mimage()
+      let PImg = new Pimage()
+      PImg.setSrc(
+        'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3803876653,2939250804&fm=26&gp=0.jpg',
+        mImg
+      )
+    </script>
+  </body>
+</html>
