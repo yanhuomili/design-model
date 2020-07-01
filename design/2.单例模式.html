@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单例模式</title>
+</head>
+<body>
+    <h1>单例模式：</h1>
+    <p>保证一个类仅有有个实例，并提供一个访问它的全局访问点</p>
+
+    <p>一个更好控制和拓展的单例模式，应该把类和管理单例的逻辑分开</p>
+
+    <script>
+        function Animal(name){
+            this.name = name
+            this.instance = null
+        }
+        Animal.prototype.getName = function(){
+            console.log(this.name)
+        }
+        Animal.getInstance=function(name){
+            if(!this.instance){
+                this.instance = new Animal(name)
+            }
+            return this.instance
+        }
+        
+        let d= Animal.getInstance('dog')
+        let c= Animal.getInstance('cat')
+        console.log(d === c,'d===c')
+        console.log(Animal.getInstance('dog'),'dog')
+        console.log(Animal.getInstance('cat'),'cat')
+
+        ////////////////////////////////
+
+        function Person(name){
+            this.name = name
+        }
+        Person.prototype.singing =function(){
+            console.log(this.name+'正在唱歌')
+        }
+        function createSinglePerson(){
+            this.name = 'create'
+        }
+        createSinglePerson.getInstance = function(name){
+            if(!this.instance){
+                this.instance = new Person(name)
+            }
+            return this.instance
+        }
+        let xiaoming = createSinglePerson.getInstance('xiaoming')
+        let xiaohong = createSinglePerson.getInstance('xiaohong')
+        xiaoming.singing()
+        xiaohong.singing()
+        console.log(xiaoming,'xiaoming')
+        console.log(xiaoming===xiaohong,'xiaoming===xiaohong')
+
+
+
+
+
+    </script>
+</body>
+</html>
