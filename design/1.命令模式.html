@@ -1,53 +1,191 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>命令模式</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>命令模式</h1>
     <p>命里模式主要是将命令的发出者和命令的执行者分离出来，以达到解耦的作用</p>
+    <p>命令模式的来由其实是回调函数面向对象的一个替代品</p>
 
     <script>
-        /* 执行者 */
-        var Animal  = function(animal){
-            this.name = animal
+      /* 执行者 */
+      var Animal = function (animal) {
+        this.name = animal
+      }
+      Animal.prototype.barking = function () {
+        console.log(this.name + 'barking')
+      }
+      Animal.prototype.eatting = function () {
+        console.log(this.name + 'eatting')
+      }
+
+      /* 命令发出 */
+      var command = function (executor) {
+        /* 方法一 */
+        var barking = function () {
+          return executor.barking()
         }
-        Animal.prototype.barking = function(){
-            console.log(this.name + 'barking')
+        var eatting = function () {
+          return executor.eatting()
         }
-        Animal.prototype.eatting = function(){
-            console.log(this.name + 'eatting')
+        return {
+          barking: barking,
+          eatting: eatting,
         }
 
-        /* 命令发出 */
-        var command = function(executor){
-            /* 方法一 */
-            var barking = function(){
-                return executor.barking()
-            }
-            var eatting = function(){
-                return executor.eatting()
-            }
-            return {
-                barking : barking,
-                eatting : eatting
-            }
+        /* 方法二 */
+        // return {
+        //     barking : executor.barking.bind(executor),
+        //     eatting : executor.eatting.bind(executor)
+        // }
+      }
+      var dog = new Animal('小狗')
+      var cat = new Animal('小猫')
+      command(dog).barking()
+      command(dog).eatting()
+      command(cat).barking()
+      command(cat).eatting()
 
-            /* 方法二 */
-            // return {
-            //     barking : executor.barking.bind(executor),
-            //     eatting : executor.eatting.bind(executor)
+      var frog = {
+        name: '青蛙',
+        jump: function (i) {
+          console.log(this.name + '跳跃' + i)
+        },
+      }
+      /* 直接返回函数是比较方便，但是不好拓展开来 */
+      //   jumpCommmand = function (receive) {
+      //     var i = 0
+      //     return function () {
+      //       i++
+      //       receive.jump(i)
+      //     }
+      //   }
+
+      /* 返回对象的形式拓展性比较好 */
+      jumpCommmand = function (receive) {
+        var i = 0
+        return {
+          done: function (n) {
+            n ? (i = n) : i++
+            receive.jump(i)
+          },
+          undone: function (n) {
+            console.log(n, 'nnnn')
+            // 撤销
+            n ? (i = n) : i--
+            receive.jump(i)
+          },
+        }
+      }
+
+      var setCommand = jumpCommmand(frog)
+      //   setCommand.done()
+      //   setCommand.done()
+      //   setCommand.undone()
+
+      var cache = [] // 队列缓存
+      run()
+      /* 执行 */
+      function doStep(cmd, n) {
+        /* 执行多少步 */
+        for (var i = 0; i < n; i++) {
+          if (cmd) {
+            cmd.done()
+            cache.push(cmd)
+          }
+        }
+      }
+      /* 撤回 */
+      function undoStep(cmd, n) {
+        /* 执行这回的命令 */
+        // for (var i = 0; i < n; i++) {
+        //   cmd.undone()
+        // }
+
+        /* 重新执行撤回后的队列 */
+        let len = cache.length
+        let stack = cache.slice(0, len - n)
+        for (var i = 0; i < stack.length; i++) {
+          stack[i].done(i + 1)
+        }
+
+        // var d
+        // while ((d = stack.shift())) {
+        //   console.log(, 'index')
+        //   d.done()
+        // }
+      }
+      function run() {
+        var cmd = setCommand
+        /* 执行多少步 */
+        doStep(cmd, 6)
+
+        /* 撤销多少步 */
+        setTimeout(() => {
+          undoStep(cmd, 2)
+        }, 1000)
+
+        setTimeout(() => {
+          doStep(cmd, 6)
+        }, 2000)
+      }
+
+      //   var arr = [1, 2, 3, 4, 5]
+      //   while (arr.shift()) {
+      //     console.log('113131231')
+      //   }
+      //   console.log(arr, 'arr')
+
+      /* 宏命令 */
+      var closeDoor = {
+        name: 'open1',
+        execute: function () {
+          console.log('开门')
+        },
+      }
+      var openComputer = {
+        name: 'open2',
+        execute: function () {
+          console.log('开电脑')
+        },
+      }
+      var openCoolAir = {
+        name: 'open3',
+        execute: function () {
+          console.log('开空调')
+        },
+      }
+      var macroCommand = function () {
+        return {
+          commandList: {},
+          add: function (command) {
+            if (!this.commandList[command.name]) {
+              this.commandList[command.name] = command
+            }
+            // this.commandList.push(command)
+          },
+          execute: function () {
+            // for (var i = 0, command; (command = this.commandList[i++]); ) {
+            //   command.execute()
             // }
+            for (var i in this.commandList) {
+              this.commandList[i].execute()
+            }
+          },
+          remove: function (command) {
+            this.commandList[command.name] &&
+              delete this.commandList[command.name]
+          },
         }
-        
-        command(new Animal('小狗')).barking()
-        command(new Animal('小狗')).eatting()
-        command(new Animal('小猫')).barking()
-        command(new Animal('小猫')).eatting()
-
-
-
+      }
+      var mCommand = macroCommand()
+      mCommand.add(closeDoor)
+      mCommand.add(openComputer)
+      mCommand.add(openCoolAir)
+      mCommand.remove(openCoolAir)
+      mCommand.execute()
     </script>
-</body>
+  </body>
 </html>
