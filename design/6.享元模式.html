@@ -1,0 +1,169 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>享元模式</title>
+  </head>
+  <body>
+    <h1>享元模式</h1>
+    <p>
+      享元模式的工作原理，关键是把内部状态和外部状态分离出来，有多少种内部状态就有多少个共享对象。
+      外部状态就储存在共享对象的外部，在必要的时候传入共享对象来组装成一个完整的对象。
+    </p>
+    <script>
+      /* 享元模式场景:按照不同性别上报一个班级学生的基本信息 */
+      /* 这里假设性别是内部状态，姓名，身高，体重都是外部状态 */
+      var Person = function(sexType){
+        this.type = sexType
+      }
+      /* 设置对象的额外信息 */
+      Person.prototype.setExtra = function(option){
+        this.name = option.name
+        this.height = option.height
+        this.weight = option.weight
+        this.id = option.id
+      }
+      var PersonFactory = (function(){
+        var person = {}
+        return {
+          create:function(sexType){
+            if(person[sexType]){
+              return person[sexType]
+            }
+            person[sexType] = new Person(sexType)
+            console.log(person[sexType],'sexTypesexType')
+            return person[sexType] = new Person(sexType)
+          }
+        }
+      })()
+      var Student = (function(){
+        studentList = []
+        return {
+          add:function(sexType,option){
+             let s = PersonFactory.create(sexType)
+             s.setExtra(option)
+             console.log(option,'option.id')
+             studentList.push(option) // 只能把信息放到数组，而不能把对象放到数据，因为操作的一直都是两个源对象
+             createStudent(s)
+          },
+          getList:function(){
+            return studentList
+          }
+        }
+      })()
+
+      var createStudent = function(s){
+        let p = document.createElement('p')
+        p.setAttribute('style','padding:5px;margin-bottom:10px;')
+        p.innerHTML = `name:${s.name}- height:${s.height}- weight:${s.weight}- id:${s.id}`
+        document.getElementsByTagName('body')[0].appendChild(p)
+      }
+      
+      var startStatistics = function(sexType,list){
+        for(let i=0;i<list.length;i++){
+          Student.add(sexType,list[i])
+        }
+      }
+      startStatistics('man',[
+        {name:'小明1',height:180,weight:70,id:1},
+        {name:'小明2',height:180,weight:70,id:2},
+        {name:'小明3',height:180,weight:70,id:3},
+        {name:'小明4',height:180,weight:70,id:4},
+        {name:'小明5',height:180,weight:70,id:5},
+        {name:'小明6',height:180,weight:70,id:6},
+      ])
+      startStatistics('woman',[
+        {name:'小红1',height:180,weight:70,id:7},
+        {name:'小红2',height:180,weight:70,id:8},
+        {name:'小红3',height:180,weight:70,id:9},
+        {name:'小红4',height:180,weight:70,id:10},
+        {name:'小红5',height:180,weight:70,id:11},
+        {name:'小红6',height:180,weight:70,id:12},
+      ])
+      console.log(Student.getList(),'StudentList')
+
+      console.log('------华丽分割线------')
+
+      var Img = function(src){
+        var img = document.createElement('img')
+        img.setAttribute('style','width:100px;height:100px;margin:10px;')
+        img.src = src
+        return img
+      }
+      /* 无状态的享元模式 也是单例模式 */
+      var imgFactory = (function(){
+        var img;
+        return{
+          create:function(src){
+            if(img){
+              return img
+            }
+            return img = new Img(src)
+          }
+        }
+      })()
+
+      // run()
+      function run(){
+        let body = document.getElementsByTagName('body')[0]
+        //https://img.yzcdn.cn/vant/tree.jpg
+        //https://img.yzcdn.cn/vant/leaf.jpg
+        //https://img.yzcdn.cn/vant/sand.jpg
+        var img1 = imgFactory.create('https://img.yzcdn.cn/vant/tree.jpg')
+        var img2 = imgFactory.create('https://img.yzcdn.cn/vant/leaf.jpg')
+        var img3 = imgFactory.create('https://img.yzcdn.cn/vant/sand.jpg')
+        console.log(img1,'img1')
+        console.log(img2,'img2')
+        console.log(img3,'img3')
+        
+        body.appendChild(img1)
+        body.appendChild(img2)
+        body.appendChild(img3)
+      }
+
+      /* ===================================== */
+
+      /*
+       线程池模式
+       使用于对象的声明周期不长的对象，不如弹框，toast提示，
+       不适用于页面图片，以及video标签的展示，因为这些都是一直保存在页面的
+       */
+      var poorFactory = function(createImgFn){
+        var objectPoor = []
+        return {
+          create:function(src){
+            var obj = objectPoor.length === 0?createImgFn.apply(this,arguments):objectPoor.shift()
+            console.log(objectPoor,'objectPoor')
+            return obj
+          },
+          recover:function(obj){
+            objectPoor.push(obj)
+          }
+        }
+      }
+
+       var imgPoorFactory = poorFactory(function(){
+          let body = document.getElementsByTagName('body')[0]
+          var img = document.createElement('img')
+          img.setAttribute('style','width:100px;height:100px;margin:10px;')
+          img.src = arguments[0]
+          body.appendChild(img)
+          img.onload = function(){
+            img.onload = null // 防止重复加载
+            imgPoorFactory.recover(img)
+          }
+          return img // 返回克隆的节点
+       })
+       var i1 = imgPoorFactory.create('https://img.yzcdn.cn/vant/tree.jpg')
+       var i2 = imgPoorFactory.create('https://img.yzcdn.cn/vant/leaf.jpg')
+       var i3 = imgPoorFactory.create('https://img.yzcdn.cn/vant/sand.jpg')
+      setTimeout(() => {
+        var i4 = imgPoorFactory.create('https://www.runoob.com/wp-content/themes/runoob/assets/images/qrcode.png')
+        // i4.src = 'https://www.runoob.com/wp-content/themes/runoob/assets/images/qrcode.png'
+        /* 这里取到的是已经回收的对象 */
+        console.log(i4,'i4')
+      }, 1000);       
+
+    </script>
+  </body>
+</html>

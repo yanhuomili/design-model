@@ -7,7 +7,99 @@
   <body>
     <h1>模板方法模式</h1>
     <p>
-      在模板方法中，子类实现中的相同部分被上移到弗雷中，而将不同的部分留待子类来实现，这也很好地体现了泛化的思想
+      在模板方法中，子类实现中的相同部分被上移到父类中，父类中封装了子类的流程和算法，而将不同的部分留待子类来实现，这也很好地体现了泛化的思想
     </p>
+    <script>
+      var DoSomething = function(){}
+      DoSomething.prototype.boilWater = function(){
+        console.log('烧开水')
+      }
+      DoSomething.prototype.addMaterial = function(){
+        throw new Error('子类必须重写该方法')
+      }
+      DoSomething.prototype.pourInCup = function(){
+        throw new Error('子类必须重写该方法')
+      }
+      DoSomething.prototype.addBatching = function(){
+        new Error('子类必须重写该方法')
+      }
+      
+      /* 添加钩子隔离改变，要不要钩子，由子类自己去实现 */
+      DoSomething.prototype.hook = function(){
+        /* 钩子默认返回true */
+        return true
+      }
+      DoSomething.prototype.init = function(){
+        /* 父类封装了子类的流程和算法 */
+        this.boilWater()
+        this.addMaterial()
+        this.pourInCup()
+        if(this.hook()){
+          /* 如果钩子返回true，则需要添加配料 */
+          this.addBatching()
+        }
+        console.log('==事情做完了，慢慢享受中。。。==')
+      }
+
+      var Tea = function(){
+      }
+      Tea.prototype = new DoSomething()
+      Tea.prototype.addMaterial = function(){
+        console.log('把茶叶加到开水中')
+      }
+      Tea.prototype.pourInCup = function(){
+        console.log('把茶水倒进杯子中')
+      }
+      Tea.prototype.addBatching = function(){
+        console.log('加入红糖牛奶等配料')
+      }
+      Tea.prototype.hook = function(){
+        return window.confirm('请问需要添加配料吗')
+      }
+
+      
+      let tea = new Tea()
+      tea.init()
+
+      console.log('------华丽分割线------')
+
+
+      /* 使用闭包实现 */
+      var Do = function(option){
+        var d1 = function(){
+          console.log('开始做某事')
+        }
+        var d2 =option.d2 || function(){
+          console.log('某事进行中')
+        }
+        var d3 = option.d3 || function(){
+          console.log('某事结束')
+        }
+        var d4 = function(){
+          console.log('所有流程走完')
+        }
+        var F = function(){}
+        F.prototype.init = function(){
+          d1()
+          d2()
+          d3()
+          d4()
+        }
+        return F
+      }
+        
+      var DoSome = Do({
+        d2:function(){
+          console.log('步骤二的方法')
+        },
+        d3:function(){
+          console.log('步骤三的方法')
+        }
+      })
+
+      var d = new DoSome()
+      d.init()
+      
+    </script>
   </body>
 </html>
