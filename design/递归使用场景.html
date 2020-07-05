@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>递归的使用场景</title>
+</head>
+<body>
+    <p>1.拍平一个多维数组</p>
+    <p>2.深拷贝</p>
+    <p>3.比较两个对象是否相等</p>
+    <script>
+        /* 拍平一个多维数组 */
+        let arr = [1,2,3,[4,5,6,[7,8,9]],10]
+        function flatten(arr){
+            const isDeep = arr.some(item => item instanceof Array)
+            if(!isDeep){
+                return arr
+            }
+            const res = Array.prototype.concat.apply([],arr)
+            return flatten(res)
+        }
+        console.log(flatten(arr),'拍平数组')
+        
+        /////////////////////////////////////////////
+
+        let obj = {
+            a:'aa',
+            b:{
+                b1:'b1',
+                b2:'b2'
+            },
+            c:'cc'
+        }
+        let obj2 = [1,2,3,4,{a:'aa',b:{b1:'b1111'}}]
+        /* 深拷贝 */
+        function deepClone(obj){
+            var cloneObj;
+            if(typeof obj!=='object'&&obj!==null){
+                return obj
+            }
+            cloneObj = obj instanceof Array ? [] : {} 
+            for(var key in obj){
+                if(obj.hasOwnProperty(key)){
+                    cloneObj[key] = obj[key]
+                }
+            }
+            return cloneObj
+        }
+        console.log(deepClone(obj),'cloneObj1')
+        console.log(deepClone(obj2),'cloneObj2')
+
+        /* 比较两个对象是否相等 */
+        function isEqual(obj1,obj2){
+            function isObject(obj){
+                return typeof obj ==='object' && obj!==null
+            }
+            /* 值类型 */
+            if(!isObject(obj1) || !isObject(obj2)){
+                return obj1 === obj2
+            }
+            if(obj1===obj2){ // 故意传两个一样的对象进来
+                return true
+            }
+            let k1 = Object.keys(obj1)
+            let k2 = Object.keys(obj2)
+            if(k1.length!=k2.length){
+                return false
+            }
+            for (let key in obj1){
+                console.log(key,'kkkkkk')
+                const res = isEqual(obj1[key],obj2[key])
+                if(!res){
+                    return false
+                }
+            }
+            return true
+        }
+        let a = {a:10,b:20,c:{d:30,g:{
+            g1:'11'
+        }},f:'ff',e:'ee'}
+        let b = {a:10,b:20,c:{d:30,g:{
+            g1:'110'
+        }},f:'ff',e:'ee'}
+        console.log(isEqual(a,b),'深度比较判断是否相等')
+    </script>
+    
+</body>
+</html>
