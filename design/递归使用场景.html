@@ -8,6 +8,9 @@
     <p>1.拍平一个多维数组</p>
     <p>2.深拷贝</p>
     <p>3.比较两个对象是否相等</p>
+
+    <p>自由变量要在函数定义的地方查找，而非函数执行的地方</p>
+    <p>this要在函数执行的地方查找，而非函数定义的地方</p>
     <script>
         /* 拍平一个多维数组 */
         let arr = [1,2,3,[4,5,6,[7,8,9]],10]
@@ -82,6 +85,45 @@
             g1:'110'
         }},f:'ff',e:'ee'}
         console.log(isEqual(a,b),'深度比较判断是否相等')
+
+        /* 
+        递归求阶乘，累加
+        10以内相乘
+        10以内相加
+        使用递归的方法需要回推，效率没有使用循环的方法高
+         */
+
+         function multiply(n){
+             if(n ===1){
+                 return n
+             }else{
+                 return n * multiply(n-1)
+             }
+         }
+         console.log(multiply(80))
+
+         /* 尾递归 */
+         function factorial(n,total = 1){
+             if(n===1){
+                 return total
+             }else{
+                return factorial(n-1,n*total)
+             }
+         }
+
+         console.log(factorial(80),'尾递归')
+         function cumulation(n){
+             if(n===1){
+                 return n
+             }else{
+                 return n + cumulation(n-1)
+             }
+         }
+         console.log(cumulation(5),'累加')
+
+
+
+        
     </script>
     
 </body>
