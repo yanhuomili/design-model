@@ -1,0 +1,116 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中介者模式</title>
+</head>
+<body>
+    <h1>中介者模式</h1>
+    <p>中介者模式目的是为了让各个对象解耦，在需求调整的时候不会出现牵一发而动全身的问题</p>
+    <script>
+        var Player = function(name,teamColor){
+            this.name = name
+            this.state = 'alive'
+            this.teamColor = teamColor
+        }
+        /* 玩家胜利 */
+        Player.prototype.win = function(){
+            console.log(this.name+'won')
+        }
+        /* 玩家失败 */
+        Player.prototype.lose = function(){
+            console.log(this.name+'lost')
+        }
+        /* 玩家死亡 */
+        Player.prototype.die = function(){
+            manage.onMessage('puhlishNews',this,'dead')
+            console.log(this.name + 'dead')
+            this.state = 'dead'
+            manage.onMessage('playerDead',this)
+        }
+        /* 玩家接收消息 */
+        Player.prototype.receiveNews = function(news){
+            console.log(this.name+ '收到消息：' +news)
+        }
+        
+
+        var playerFactory = function(name,teamColor){
+            var player = new Player(name,teamColor)
+            manage.onMessage('addPlayer',player)
+            return player
+        }
+
+        var  manage = (function(){
+            var players={} // 保存队伍
+            var operations = {}
+            operations.addPlayer = function(player){
+                let teamColor = player.teamColor
+                players[teamColor] = players[teamColor] || []
+                players[teamColor].push(player)
+            }
+            operations.playerDead = function(player){
+                let teamColor = player.teamColor
+                let teamPlayers =  players[teamColor] // 玩家所在队伍
+                var all_dead = true
+                for(var i=0;i<teamPlayers.length;i++){
+                    if(teamPlayers[i].state !=='dead'){
+                        all_dead = false
+                        break
+                    }
+                }
+                if(all_dead){ //所有队员死亡
+                    /* 本队伍失败 */
+                    for(var i=0;i<teamPlayers.length;i++){
+                        teamPlayers[i].lose()
+                    }
+                    /* 其他队伍胜利 */
+                    for(var key in players){
+                        if(key!==teamColor){
+                            for(var j=0;j<players[key].length;j++){
+                                players[key][j].win()
+                            }
+                        }
+                    }
+                }
+
+            }
+            operations.puhlishNews = function(player,newText){
+                for(var key in players){
+                    for(var i=0;i<players[key].length;i++){
+                        if(players[key][i]!==player){
+                            players[key][i].state !=='dead'&&players[key][i].receiveNews(player.name + newText)
+                        }
+                    }
+                }
+            }
+
+            var onMessage = function(){
+                let message = Array.prototype.shift.call(arguments) // 参数的第一个为消息名称
+                operations[message].apply(this,arguments)
+            }
+
+            return {
+                onMessage:onMessage
+            }
+        })()
+
+        var p1 = playerFactory('小明1','red')
+        var p2 = playerFactory('小明2','red')
+        var p3 = playerFactory('小明3','red')
+        var p4 = playerFactory('小明4','red')
+
+        var p5 = playerFactory('小华1','blue')
+        var p6 = playerFactory('小华2','blue')
+        var p7 = playerFactory('小华3','blue')
+        var p8 = playerFactory('小华4','blue')
+
+        
+        p1.die()
+        p2.die()
+        p3.die()
+        p4.die()
+
+        
+    </script>
+</body>
+</html>
