@@ -1,0 +1,219 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>职责链模式</title>
+</head>
+<body>
+    <h1>职责链模式</h1>
+    <p>职责链模式使多个对象都有机会处理请求，从而避免请求发出者和接收者之间的耦合关系</p>
+    <p>职责链模式最大的优点：请求发送者只需要知道链中的第一个节点，从而弱化了发送者和一组接受者之间的强联系。</p>
+
+    <script>
+        /* 处理逻辑的函数 */
+        var fn1 = function(type){
+            if(type===1){
+                console.log('fn1方法')
+            }else{
+                return 'next'
+            }
+        }
+        var fn2 = function(type){
+            if(type===2){
+                console.log('fn2方法')
+            }else{
+                return 'next'
+            }
+        }
+        var fn3 = function(type){
+            if(type===3){
+                console.log('fn3方法')
+            }else{
+                return 'next'
+            }
+        }
+
+        /* 创建职责链 */
+        var Chain = function(fn){
+            this.fn = fn
+            this.success = null
+        }
+        /* 设置链中的下一个节点 */
+        Chain.prototype.setNext = function(success){
+            return this.success = success
+        }
+        Chain.prototype.pass = function(){
+            var ret = this.fn.apply(this,arguments)
+            if(ret === 'next'){
+                return this.success&&this.success.pass.apply(this.success,arguments)
+            }
+            return ret
+        }
+        Chain.prototype.next = function(){
+            return this.success&&this.success.pass.apply(this.success,arguments)
+        }
+
+        /* 将处理函数包装成链节点 */
+        // var c1 = new Chain(fn1)
+        // var c2 = new Chain(fn2)
+        // var c3 = new Chain(fn3)
+        // c1.setNext(c2)
+        // c2.setNext(c3)
+
+        // c1.pass(3)
+
+
+//////////////////职责链拓展/////////////////////////
+
+        /* 异步方法，或者promise */
+        var async1 = async function(){
+            await new Promise((resolve,reject)=>{
+                console.log('异步队列1')
+                resolve()
+            })
+        }
+        var async2 = async function(){
+            await new Promise((resolve,reject)=>{
+                setTimeout(() => {
+                    console.log('异步队列2')
+                    resolve()   
+                }, 500);
+            })
+        }
+        var async3 = async function(){
+            await new Promise((resolve,reject)=>{
+                setTimeout(() => {
+                    console.log('异步队列3')
+                    resolve()
+                }, 1000);
+            })
+        }
+
+        /* 构造函数是想异步队列 */
+        var Pro = function(){
+            var listP = []
+            /* 创建职责链 */
+            var Chain = function(fn){
+                this.fn = fn
+                this.success = null
+            }
+            /* 设置链中的下一个节点 */
+            Chain.prototype.setNext = function(success){
+                return this.success = success
+            }
+            Chain.prototype.pass = function(){
+                var ret = this.fn.apply(this,arguments)
+                if(ret === 'next'){
+                    return this.success&&this.success.pass.apply(this.success,arguments)
+                }
+                return ret
+            }
+            Chain.prototype.next = function(){
+                return this.success&&this.success.pass.apply(this.success,arguments)
+            }
+            return {
+                all:function(list){
+                    for(var i=0;i<list.length;i++){
+                        (function(i){
+                            let p = new Chain(list[i])
+                            var fn = p.fn
+                            var f = async function(){
+                                await fn()
+                                this.next()
+                            }
+                            p.fn = f
+                            listP.push(p)
+                        })(i)
+                    }
+                    for(var j=0;j<listP.length-1;j++){
+                        let n = j
+                        let m = n+1
+                        listP[n].setNext(listP[m])
+                    }
+                    listP[0].pass()
+                }
+            }
+        }
+
+        function login(){
+            return new Promise(resolve=>{
+                // setTimeout(() => {
+                    console.log('登录')
+                    resolve()
+                // }, 1000);
+            })
+        }
+        function getToken(){
+            return new Promise(reject=>{
+                setTimeout(() => {
+                    console.log('获取token')
+                    reject()
+                }, 1000);
+            })
+        }
+        function getData(){
+            return new Promise(resolve=>{
+                setTimeout(() => {
+                    console.log('获取登录信息')
+                    resolve()
+                }, 4000);
+            })
+        }
+
+        // Pro().all([async1,async2,async3])
+        // Pro().all([login,getToken,getData])
+
+
+
+        /* 通过职责链模式封装异步队列，传入的异步函数必须是一个promise */
+        var myPromise = {
+            queue:function(list){
+                var listP = []
+                /* 创建职责链 */
+                var Chain = function(fn){
+                    this.fn = fn
+                    this.success = null
+                }
+                /* 设置链中的下一个节点 */
+                Chain.prototype.setNext = function(success){
+                    return this.success = success
+                }
+                Chain.prototype.pass = function(){
+                    var ret = this.fn.apply(this,arguments)
+                    if(ret === 'next'){
+                        return this.success&&this.success.pass.apply(this.success,arguments)
+                    }
+                    return ret
+                }
+                Chain.prototype.next = function(){
+                    return this.success&&this.success.pass.apply(this.success,arguments)
+                }
+                for(var i=0;i<list.length;i++){
+                    (function(i){
+                        let p = new Chain(list[i])
+                        var fn = p.fn
+                        var f = async function(){
+                            await fn()
+                            this.next()
+                        }
+                        p.fn = f
+                        listP.push(p)
+                    })(i)
+                }
+                for(var j=0;j<listP.length-1;j++){
+                    let n = j
+                    let m = n+1
+                    listP[n].setNext(listP[m])
+                }
+                listP[0].pass()
+            }
+        }
+
+        myPromise.queue([login,getToken,getData])
+        myPromise.queue([async1,async2,async3])
+
+
+    </script>
+    
+</body>
+</html>

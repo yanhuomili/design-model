@@ -7,6 +7,8 @@
 <body>
     <h1>中介者模式</h1>
     <p>中介者模式目的是为了让各个对象解耦，在需求调整的时候不会出现牵一发而动全身的问题</p>
+    <p>已终结者和对象之间的一对多关系取代了对象之间网状的多对多的关系，各个对象只需关注自身功能的实现，对象之间的关系交给中介者来实现和维护</p>
+    <p>中介者模式也存在缺点：系统中多了一个中介者对象，对象之间交互的复杂性转移到了中介者身上，使得中介者对象往往是一个难以维护的对象       </p>
     <script>
         var Player = function(name,teamColor){
             this.name = name
@@ -23,10 +25,11 @@
         }
         /* 玩家死亡 */
         Player.prototype.die = function(){
-            manage.onMessage('puhlishNews',this,'dead')
             console.log(this.name + 'dead')
             this.state = 'dead'
+            manage.onMessage('puhlishNews',this,'dead')
             manage.onMessage('playerDead',this)
+            manage.onMessage('remove',this)
         }
         /* 玩家接收消息 */
         Player.prototype.receiveNews = function(news){
@@ -83,6 +86,17 @@
                     }
                 }
             }
+            operations.remove = function(player){
+                let teamColor = player.teamColor
+                let teamPlayers = players[teamColor]
+                for(var i=0;i<teamPlayers.length;i++){
+                    if(teamPlayers[i]===player){
+                        teamPlayers.splice(i,1)
+                        i--
+                        break
+                    }
+                }
+            }
 
             var onMessage = function(){
                 let message = Array.prototype.shift.call(arguments) // 参数的第一个为消息名称
@@ -108,9 +122,11 @@
         p1.die()
         p2.die()
         p3.die()
+
+        p6.die()
+        
         p4.die()
 
-        
     </script>
 </body>
 </html>
