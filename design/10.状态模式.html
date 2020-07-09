@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>状态模式</title>
+</head>
+<body>
+    <h1>状态模式</h1>
+    <p>状态模式把每个状态抽离成一个个对象，把管理状态的对象的引用放到一个个状态中去，在状态触发时调用状态对象的方法，
+        把状态指向下一个状态对象。
+        状态模式跟中介者模式类似，中介者模式是在中介者操作各个对象的方法
+    </p>
+    <button id="btn">切换状态</button>
+    <div id="show-color"></div>
+
+
+    <script>
+        var showColor = document.getElementById('show-color')
+        var Blue = function(manageColor){
+            this.manageColor = manageColor
+        }
+        Blue.prototype.do = function(){
+            showColor.innerHTML =  '这是蓝色'
+            console.log('这是蓝色')
+            console.log('切换到黄色')
+            this.manageColor.setState(this.manageColor.yellowState)// 手动切换到红色
+        }
+
+        var Red = function(manageColor){
+            this.manageColor = manageColor
+        }
+        Red.prototype.do = function(){
+            showColor.innerHTML =  '这是红色'
+            console.log('这是红色')
+            console.log('切换到绿色')
+            this.manageColor.setState(this.manageColor.greenState)// 手动切换到绿色
+        }
+        var Green = function(manageColor){
+            this.manageColor = manageColor
+        }
+        Green.prototype.do = function(){
+            showColor.innerHTML =  '这是绿色'
+            console.log('这是绿色')
+            console.log('切换关闭')
+            this.manageColor.setState(this.manageColor.closeState)// 手动切换到绿色
+        }
+        var Close = function(manageColor){
+            this.manageColor = manageColor
+        }
+        Close.prototype.do = function(){
+            showColor.innerHTML =  '关闭状态'
+            console.log('关闭状态')
+            console.log('切换到蓝色')
+            this.manageColor.setState(this.manageColor.blueState)// 手动切换到绿色
+        }
+        
+        /* 新增状态 */
+        var Yellow = function(manageColor){
+            this.manageColor = manageColor
+        }
+        Yellow.prototype.do = function(){
+            showColor.innerHTML =  '这是黄色'
+            console.log('这是黄色')
+            console.log('切换到红色')
+            this.manageColor.setState(this.manageColor.redState)// 手动切换到绿色
+        }
+
+        /* 管理状态对象 */
+        var ManageColor = function(){
+            this.closeState = new Close(this) // 把当前管理者的实例传入各个状态对象
+            this.blueState = new Blue(this) // 把当前管理者的实例传入各个状态对象
+            this.redState = new Red(this) // 把当前管理者的实例传入各个状态对象
+            this.greenState = new Green(this) // 把当前管理者的实例传入各个状态对象
+            this.yellowState = new Yellow(this) // 把当前管理者的实例传入各个状态对象
+            this.button = null
+        }
+        ManageColor.prototype.setState = function(newState){
+            this.currentState = newState
+        }
+        ManageColor.prototype.init = function(){
+            let btn = document.getElementById('btn')
+            this.currentState = this.closeState
+            this.nextStat = null
+            let self = this
+            btn.onclick = function(){
+                self.currentState.do()
+            }
+        }
+
+        let manage = new ManageColor()
+        manage.init()
+
+    </script>
+</body>
+</html>
