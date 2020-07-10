@@ -23,7 +23,9 @@
             showColor.innerHTML =  '这是蓝色'
             console.log('这是蓝色')
             console.log('切换到黄色')
-            this.manageColor.setState(this.manageColor.yellowState)// 手动切换到红色
+            if(this.manageColor){
+                this.manageColor.setState(this.manageColor.yellowState)// 手动切换到红色
+            }
         }
 
         var Red = function(manageColor){
@@ -33,7 +35,9 @@
             showColor.innerHTML =  '这是红色'
             console.log('这是红色')
             console.log('切换到绿色')
-            this.manageColor.setState(this.manageColor.greenState)// 手动切换到绿色
+            if(this.manageColor){
+                this.manageColor.setState(this.manageColor.greenState)// 手动切换到绿色
+            }
         }
         var Green = function(manageColor){
             this.manageColor = manageColor
@@ -42,7 +46,9 @@
             showColor.innerHTML =  '这是绿色'
             console.log('这是绿色')
             console.log('切换关闭')
-            this.manageColor.setState(this.manageColor.closeState)// 手动切换到绿色
+            if(this.manageColor){
+                this.manageColor.setState(this.manageColor.closeState)// 手动切换到绿色
+            }
         }
         var Close = function(manageColor){
             this.manageColor = manageColor
@@ -51,7 +57,9 @@
             showColor.innerHTML =  '关闭状态'
             console.log('关闭状态')
             console.log('切换到蓝色')
-            this.manageColor.setState(this.manageColor.blueState)// 手动切换到绿色
+            if(this.manageColor){
+                this.manageColor.setState(this.manageColor.blueState)// 手动切换到绿色
+            }
         }
         
         /* 新增状态 */
@@ -62,10 +70,15 @@
             showColor.innerHTML =  '这是黄色'
             console.log('这是黄色')
             console.log('切换到红色')
-            this.manageColor.setState(this.manageColor.redState)// 手动切换到绿色
+            if(this.manageColor){
+                this.manageColor.setState(this.manageColor.redState)// 手动切换到绿色
+            }
         }
 
-        /* 管理状态对象 */
+        /* 
+        管理状态对象,在每个状态里面都要指定下一个状态，当后期需要添加更多状态的时候，需要自己重新处理
+        每个状态的下一个状态，拓展的时候没有这么方便
+        */
         var ManageColor = function(){
             this.closeState = new Close(this) // 把当前管理者的实例传入各个状态对象
             this.blueState = new Blue(this) // 把当前管理者的实例传入各个状态对象
@@ -80,7 +93,7 @@
         ManageColor.prototype.init = function(){
             let btn = document.getElementById('btn')
             this.currentState = this.closeState
-            this.nextStat = null
+            this.nextState = null
             let self = this
             btn.onclick = function(){
                 self.currentState.do()
@@ -89,6 +102,47 @@
 
         let manage = new ManageColor()
         manage.init()
+
+
+
+
+
+        /* 
+        状态模式再优化，感觉变成了中介者模式，全部的逻辑都在manageColor这个类上面实现，
+        各个状态的类只负责自己的职责，当要加入更多状态的时候，不需要增加任何逻辑
+        */
+        var ManageColor = function(list){
+            this.constructorList = list
+            this.stateList = []
+            this.index = 0
+            this.button = null
+        }
+        ManageColor.prototype.setState = function(newState){
+            this.currentState = newState
+        }
+        ManageColor.prototype.initState = function(){
+            for(var i = 0;i<this.constructorList.length;i++){
+                this.stateList.push(new this.constructorList[i]())
+            }
+            this.currentState = this.stateList[0] // 指定第一个状态
+        }
+        ManageColor.prototype.init = function(){
+            let btn = document.getElementById('btn')
+            this.initState()
+            let self = this
+            btn.onclick = function(){
+                self.index +=1
+                if(self.index===self.stateList.length){
+                    self.index = 0
+                }
+                self.currentState.do()
+                self.setState(self.stateList[self.index])
+            }
+        }
+
+        let list = [Close,Blue,Red,Green,Yellow]
+        let manage1 = new ManageColor(list)
+        manage1.init()
 
     </script>
 </body>
