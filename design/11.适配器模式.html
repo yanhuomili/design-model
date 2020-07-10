@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>适配器模式</title>
+</head>
+<body>
+    <h1>适配器模式主要是用在接口的不兼容问题，它不需要改变已有的接口</h1>
+    <p>使用场景：新旧接口的数据结构不兼容的时候，我们只需要通过适配器去重新包装一下旧接口返回的数据</p>
+    <div id="box"></div>
+    <script>
+        /* 旧接口返回的数据结构 */
+        function oldData (){
+            return{
+                code:0,
+                data:{
+                    a:'a',
+                    b:'b',
+                    c:'c'
+                },
+                msg:'请求成功'
+            }
+        }
+        /* 新接口返回的数据结构 */
+        function newData(){
+            return {
+                status:1,
+                data:{
+                    a:'a',
+                    b:'b',
+                    c:'c'
+                },
+                message:'请求成功'
+            }
+        }
+
+        /* 适配器 */
+        function adapter(getDataFn){
+            let oldData = getDataFn()
+            for(var key in oldData){
+                if(key === 'code'){
+                    let oldV = oldData[key]
+                    delete oldData[key]
+                    key = 'status'
+                    oldData[key] = oldV
+                }
+                if(key === 'msg'){
+                    let oldV = oldData[key]
+                    delete oldData[key]
+                    key = 'message'
+                    oldData[key] = oldV
+                }
+            }
+            return oldData
+        }
+        adapter(oldData)
+
+        let oldD = adapter(oldData) //通过适配器去调整原来的数据结构
+        let newD = newData()
+        function render(data){
+            let box = document.createElement('div')    
+            box.innerHTML = '状态：'+data.status+',信息：'+data.message
+            document.body.appendChild(box)
+        }
+
+        render(oldD)
+        render(newD)
+
+
+
+    </script>
+    
+</body>
+</html>
