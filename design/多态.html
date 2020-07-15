@@ -1,0 +1,42 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多态</title>
+</head>
+<body>
+    <p>
+        多态的实际意义：同一操作作用于不同的对象上面，
+        可以产生不同的解释和不同的执行结果，
+        换句话说给不同的对象发送同一消息的时候，这些对象会根据这个消息分别给出不同的反馈
+    </p>
+    <script>
+        function run(a,b,c){
+            let d = [].shift.call(arguments)
+            console.log(arguments,'arguments')
+            console.log(d,'arguments')
+        }
+        run(1,2,3)
+
+        var obj = {name:'lili'}
+        var name = '111'
+
+        Function.prototype.bind = function(){
+            var self = this
+            var context = [].shift.call(arguments)
+            var args = [].slice.call(arguments)
+            return function(){
+                return self.apply(context,[].concat.call(args,[].slice.call(arguments)))
+            }
+        }
+
+        var a = function(){
+            console.log(this.name,'name')
+        }
+        a()
+        a.bind(obj)()
+
+    </script>
+    
+</body>
+</html>

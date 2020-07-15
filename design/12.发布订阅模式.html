@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布订阅模式</title>
+</head>
+<body>
+    <h1>发布订阅模式</h1>
+    <script>
+        /* 发布订阅模式 */
+        var sale = {
+            customsList:{},
+            publish(type,news){ // 发布消息
+                var list = this.customsList[type]
+                for(var i=0;i<list.length;i++){
+                    list[i](type +':'+news)
+                }
+            },
+            addListen(type,fn){ // 添加订阅者
+                if(!this.customsList[type]){
+                    this.customsList[type] = []
+                }
+                this.customsList[type].push(fn)
+            }
+        }
+        var f1=function(news){
+            console.log(news)
+        }
+        var f2=function(news){
+            console.log(news)
+        }
+        sale.addListen('A',f1)
+        sale.addListen('A',f2)
+        sale.addListen('B',f2)
+        
+        sale.publish('A','有楼盘开盘了')
+        sale.publish('B','有楼盘开盘了')
+
+
+        /* 
+        观察者模式
+        观察者模式要把观察者添加到目标对象上
+        */
+
+        /* 目标者 */
+        var subject = {
+            observerList:[],
+            addObj(observer){
+                this.observerList.push(observer)
+            },
+            notify(){
+                for(var observer of this.observerList){
+                    observer.update()
+                }
+            }
+        }
+
+        /* 观察者 */
+        var observer1 = {
+            name:'lili',
+            update(){
+                console.log(this.name + ' is updating')
+            }
+        }
+        var observer2 = {
+            name:'huahua',
+            update(){
+                console.log(this.name + ' is updating')
+            }
+        }
+
+        subject.addObj(observer1)
+        subject.addObj(observer2)
+        subject.notify(observer2)
+
+
+
+
+
+
+
+    </script>
+    
+</body>
+</html>
