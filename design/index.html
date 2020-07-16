@@ -102,7 +102,11 @@
 
         路由：
         hash模式:
-        histroy模式: 需要后端支持
+            hash变化会触发网页跳转，即浏览器前进、后退
+            hash变化不会刷新页面，spa必须的特点
+            hash变化不会提交到server
+
+        h5 histroy模式: 需要后端支持
 
         vue原理：
         考察重点而不是考察细节：
@@ -126,9 +130,42 @@
         MVVM: Model-View-ViewModel
         mvvm就是数据驱动视图，当我们的数据改变的时候，视图也会随之更新，
         当我们通过视图中绑定的某些事件来更新数据之后，viewmodel也会驱动视图的更新
+        
 
+        h
+        vnode
+        patch
+        diff
+        key
 
+        模板编译:模板编译为render函数，render函数生成vnode,vnode再执行patch和diff
+            指令：
+            插值：
+            js表达式：
 
+        组件渲染和更新的过程：
+            初次渲染过程：
+                解析模板为render函数
+                触发响应式，触发data的get,只有模板用的的data才会触发get
+                执行render函数生成vnode，patch(ele,vnode)
+
+            更新过程：
+                修改data,触发set
+                重新执行render函数生成vnode
+                patch(vnode,newVnode)
+
+            异步渲染：
+                
+
+            
+            with语法：使用with能改变{}内的自由变量查找规则，当做obj的属性来查找
+                找不到匹配的属性就会报错
+            vue template complier将模板变异成redner函数
+            执行render函数生成vnode
+
+            
+
+            
 
 
     
