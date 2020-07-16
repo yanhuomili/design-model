@@ -1,0 +1,142 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue</title>
+    <script crossorigin="anonymous" integrity="sha384-OZmxTjkv7EQo5XDMPAmIkkvywVeXw59YyYh6zq8UKfkbor13jS+5p8qMTBSA1q+F" src="https://lib.baomitu.com/vue/2.6.11/vue.min.js"></script>
+</head>
+<body>
+
+    <div id="app">
+        <div>{{msg}}</div>
+        <div @click="change">改变</div>
+    </div>
+
+    <script>
+        new Vue({
+            el:'#app',
+            data:{
+                msg:'vue 面试题',
+                obj:{
+                    a:0,
+                    b:'bbb'
+                }
+            },
+            mounted() {
+                this.todo()
+            },
+            methods: {
+                todo(){
+                    console.log(123)
+                    var o = {
+                        add:function(){
+                            console.log('add')
+                        },
+                        del:function(){
+                            console.log('del')
+                        },
+                        push:function(){
+                            console.log('push')
+                        },
+                        pop:function(){
+                            console.log('pop')
+                        }
+                    }
+
+                    var B = function(){}
+                    B.prototype = o
+                    var b = new B()
+                    b.push()
+                    var bb = b.__proto__.push
+                    b.__proto__.push = function(){
+                        console.log('bbbbbbb 拓展方法')
+                        bb()
+                    }
+
+                    var newO = Object.create(o)
+                    newO.push()
+                    console.log(newO.__proto__,'newO')
+                    b.push()
+                    newO.push()
+                    newO.push()
+
+
+                },
+                
+                change(){
+                    console.log(this.obj.a)
+                    console.log(this.obj)
+                }
+            },
+        })
+
+
+
+
+        /* 
+        key的作用： 因为vue组件高度复用增加Key可以标识组件的唯一性，为了更好地区别各个组件 key的作用主要是为了高效的更新虚拟DOM
+        父子组件通讯：props,$emit
+        兄弟组件通:自定义事件event.$on('xx',fn),event.$eimt('xx',123)
+        
+
+        $nextTick:data改变之后，dom不会立刻渲染，而是异步渲染的，页面渲染时data的修改会做整合，
+        多次修都只会渲染一次，异步渲染才能做整合，同步渲染的话是无法做整合，
+        $nextTick 在dom渲染完之后的回调函数
+
+        动态组件：is:componentName,根据数据来确定渲染哪个文件
+        异步组件：import()函数，按需加载。路由使用异步组件：提高首屏加载速度。页面内使用异步组件可以提高页面的渲染速度
+        只有当我们用到的时候才会加载出来。
+        keepAlive:组件缓存
+        mixin:混合，优点：代码的复用，缺点：数据来源不明确，代码可读性不好，容易造成命名冲突
+        
+
+        vuex：
+        state:数据
+        mutations:同步操作 emit
+        actions:异步操作 dispatch
+        mapState:
+        mapGetters:
+        mapMutatins:
+        mapActions:
+        
+
+        路由：
+        hash模式:
+        histroy模式: 需要后端支持
+
+        vue原理：
+        考察重点而不是考察细节：
+        虚拟dom：
+        模板渲染：
+        组件化：
+        响应式：深度监听使用递归，数据层级深的时候比较耗性能。设置新值的时候需要使用Vue.set()
+        defineProperty:监听对象和数组的缺陷，需要递归去监听。它不具备监听数组的能力，解决方法是重写数组的原型方法。
+            let arrProp = Object.create(Array.prototype)
+        proxy:兼容性不好，IE11不支持proxy，无法polyfil
+        渲染过程：
+        前端路由：
+        整体流程是否全面：
+        热门技术是否有深度：
+        描述组件渲染和更新过程：
+        v-model实现原理：
+
+        组件化：
+        传统组件，只是静态渲染，数据更新依赖dom操作
+        数据驱动视图 Vue mvvm
+        MVVM: Model-View-ViewModel
+        mvvm就是数据驱动视图，当我们的数据改变的时候，视图也会随之更新，
+        当我们通过视图中绑定的某些事件来更新数据之后，viewmodel也会驱动视图的更新
+
+
+
+
+
+    
+
+
+        */
+
+    </script>
+    
+</body>
+</html>
