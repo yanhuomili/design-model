@@ -1,79 +1,77 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue</title>
-    <script crossorigin="anonymous" integrity="sha384-OZmxTjkv7EQo5XDMPAmIkkvywVeXw59YyYh6zq8UKfkbor13jS+5p8qMTBSA1q+F" src="https://lib.baomitu.com/vue/2.6.11/vue.min.js"></script>
-</head>
-<body>
-
+    <script
+      crossorigin="anonymous"
+      integrity="sha384-OZmxTjkv7EQo5XDMPAmIkkvywVeXw59YyYh6zq8UKfkbor13jS+5p8qMTBSA1q+F"
+      src="https://lib.baomitu.com/vue/2.6.11/vue.min.js"
+    ></script>
+  </head>
+  <body>
     <div id="app">
-        <div>{{msg}}</div>
-        <div @click="change">改变</div>
+      <div>{{msg}}</div>
+      <div @click="change">改变</div>
     </div>
 
     <script>
-        new Vue({
-            el:'#app',
-            data:{
-                msg:'vue 面试题',
-                obj:{
-                    a:0,
-                    b:'bbb'
-                }
-            },
-            mounted() {
-                this.todo()
-            },
-            methods: {
-                todo(){
-                    console.log(123)
-                    var o = {
-                        add:function(){
-                            console.log('add')
-                        },
-                        del:function(){
-                            console.log('del')
-                        },
-                        push:function(){
-                            console.log('push')
-                        },
-                        pop:function(){
-                            console.log('pop')
-                        }
-                    }
+      new Vue({
+        el: '#app',
+        data: {
+          msg: 'vue 面试题',
+          obj: {
+            a: 0,
+            b: 'bbb',
+          },
+        },
+        mounted() {
+          this.todo()
+        },
+        methods: {
+          todo() {
+            console.log(123)
+            var o = {
+              add: function () {
+                console.log('add')
+              },
+              del: function () {
+                console.log('del')
+              },
+              push: function () {
+                console.log('push')
+              },
+              pop: function () {
+                console.log('pop')
+              },
+            }
 
-                    var B = function(){}
-                    B.prototype = o
-                    var b = new B()
-                    b.push()
-                    var bb = b.__proto__.push
-                    b.__proto__.push = function(){
-                        console.log('bbbbbbb 拓展方法')
-                        bb()
-                    }
+            var B = function () {}
+            B.prototype = o
+            var b = new B()
+            b.push()
+            var bb = b.__proto__.push
+            b.__proto__.push = function () {
+              console.log('bbbbbbb 拓展方法')
+              bb()
+            }
 
-                    var newO = Object.create(o)
-                    newO.push()
-                    console.log(newO.__proto__,'newO')
-                    b.push()
-                    newO.push()
-                    newO.push()
+            var newO = Object.create(o)
+            newO.push()
+            console.log(newO.__proto__, 'newO')
+            b.push()
+            newO.push()
+            newO.push()
+          },
 
+          change() {
+            console.log(this.obj.a)
+            console.log(this.obj)
+          },
+        },
+      })
 
-                },
-                
-                change(){
-                    console.log(this.obj.a)
-                    console.log(this.obj)
-                }
-            },
-        })
-
-
-
-
-        /* 
+      /* 
         key的作用： 因为vue组件高度复用增加Key可以标识组件的唯一性，为了更好地区别各个组件 key的作用主要是为了高效的更新虚拟DOM
         父子组件通讯：props,$emit
         兄弟组件通:自定义事件event.$on('xx',fn),event.$eimt('xx',123)
@@ -117,6 +115,7 @@
         defineProperty:监听对象和数组的缺陷，需要递归去监听。它不具备监听数组的能力，解决方法是重写数组的原型方法。
             let arrProp = Object.create(Array.prototype)
         proxy:兼容性不好，IE11不支持proxy，无法polyfil
+            
         渲染过程：
         前端路由：
         整体流程是否全面：
@@ -160,7 +159,7 @@
             
             with语法：使用with能改变{}内的自由变量查找规则，当做obj的属性来查找
                 找不到匹配的属性就会报错
-            vue template complier将模板变异成redner函数
+            vue template complier将模板编译成redner函数
             执行render函数生成vnode
 
             
@@ -172,8 +171,6 @@
 
 
         */
-
     </script>
-    
-</body>
+  </body>
 </html>

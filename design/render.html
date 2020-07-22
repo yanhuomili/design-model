@@ -1,0 +1,52 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>浏览器渲染过程</title>
+  </head>
+  <body>
+    <h1>浏览器渲染过程</h1>
+    <ul>
+      <li>水电费水电费时间的方式符合</li>
+      <li>水电费水电费时间的方式符合</li>
+      <li>水电费水电费时间的方式符合</li>
+      <li>水电费水电费时间的方式符合</li>
+      <li>水电费水电费时间的方式符合</li>
+      <li>水电费水电费时间的方式符合</li>
+    </ul>
+  </body>
+  <script>
+    let body = document.getElementsByTagName('body')[0]
+    createDom('body')
+    run()
+    createDom('end')
+    function run() {
+      createDom('run')
+      a()
+      b()
+      c()
+    }
+    function createDom(text) {
+      let dom = document.createElement('div')
+      dom.innerHTML = text
+      body.appendChild(dom)
+    }
+    function a() {
+      let t = new Date()
+      /* 强行阻塞页面两秒钟 */
+      while (new Date() - t < 2000) {}
+      createDom('setTimeout----aaaa')
+      createDom('aaaa')
+    }
+    function b() {
+      let t = new Date()
+      // while (new Date() - t < 2000) {}
+      createDom('bbb')
+    }
+    function c() {
+      let t = new Date()
+      // while (new Date() - t < 2000) {}
+      createDom('cccc')
+    }
+  </script>
+</html>
